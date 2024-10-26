@@ -58,7 +58,7 @@ const EditNode = ({ note, setShowEditNote, setNote }) => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="edueDate" className="block text-lg font-medium text-[#EDB7ED]">
-                    Due Date
+                    Date
                   </label>
                   <textarea
                     className="mt-1 p-2 text-black w-full border rounded-md"
@@ -74,7 +74,7 @@ const EditNode = ({ note, setShowEditNote, setNote }) => {
             <div className="bg-[#28231D] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <button
                 type="button"
-                className="mx-4 max-w-sm bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md uppercase font-bold shadow-md rounded-lg px-4 py-2"
+                className="mx-4 max-w-sm px-4 py-2 text-sm font-medium text-white hover:bg-red-300 bg-red-500 border border-transparent rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                 onClick={handleclick}
               >
                 Update note

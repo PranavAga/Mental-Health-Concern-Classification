@@ -1,12 +1,18 @@
 import React, { useContext, useState } from 'react';
 import noteContext from '../context/notes/noteContext';
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 const AddNote = (props) => {
   const context = useContext(noteContext);
   const { addNote } = context;
   const {showAlert} = props;
 
-  const [note, setNote] = useState({ title: '', description: '', dueDate: '' });
+  const [note, setNote] = useState({ title: '', description: '', 
+    // in ISO 8601 format
+      dueDate: new Date().toISOString()
+  });
   
 
   const handleclick = async (e) => {
@@ -63,17 +69,31 @@ const AddNote = (props) => {
       </div>
       <div className="mb-3">
         <label htmlFor="dueDate" className="block text-lg font-medium">
-          Due Date
+          Date
         </label>
-        <textarea
+        {/* <textarea
           className="mt-1 p-2 text-black w-full border rounded-md"
           value={note.dueDate}
           id="dueDate"
           name="dueDate"
-          placeholder="Task due date.."
+          placeholder="Date"
           rows="1"
           onChange={onChange}
-        ></textarea>
+        ></textarea> */}
+        <DatePicker
+        className='mt-1 p-2 text-black w-full border rounded-md'
+          selected={note.dueDate? new Date(note.dueDate): new Date()}
+          onChange={(date) => {
+            setNote({
+            ...note,
+            dueDate: date.toISOString(),
+          })
+        }}
+          showTimeSelect
+          timeFormat="HH:mm"
+          timeIntervals={15}
+          dateFormat="MMM d, yyyy h:mm aa"
+        />
       </div>
       <button type="button" className=" max-w-sm bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md uppercase font-bold shadow-md rounded-lg mx-auto px-4 py-2" onClick={handleclick}>
         Add note
