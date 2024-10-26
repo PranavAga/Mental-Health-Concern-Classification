@@ -1,12 +1,30 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import AddNote from './AddNote';
-import NoteItem from './NoteItem';
 import noteContext from '../context/notes/noteContext';
 import { useNavigate } from 'react-router-dom';
+import { Chrono } from "react-chrono";
+
+function convertToRecentDate(date) {
+  let title;
+  const now = new Date();
+  const dueDate = new Date(date);
+  const daysDifference = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
+
+  // // Format using relative time for recent dates
+  // if (Math.abs(daysDifference) <= 30) {
+  //   const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  //   title = rtf.format(daysDifference, 'day'); // e.g., "5 days ago" or "in 3 days"
+  // } else {
+  //   // For dates older than 30 days, use a full date format
+  //   title = dueDate.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+  // }
+
+  title = dueDate.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+  return title;
+}
 
 const Notes = () => {
   const context = useContext(noteContext);
-  const { notes, getNotes, editNote } = context;
+  const { notes, getNotes, editNote, deleteNote } = context;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +46,6 @@ const Notes = () => {
       edescription: currentNote.description,
       edueDate: currentNote.dueDate,
     });
-    // Open the modal
     ref.current.classList.remove('hidden');
   };
 
@@ -38,19 +55,54 @@ const Notes = () => {
 
   const handleclick = (e) => {
     editNote(note.id, note.etitle, note.edescription, note.edueDate);
-    // Close the modal
     ref.current.classList.add('hidden');
   };
 
+  const items = notes.map(note => ({
+    // title: note.dueDate || "No Date",
+    title: note.dueDate ? convertToRecentDate(note.dueDate) : "No Date",
+    date: note.dueDate,
+    cardTitle: note.title,
+    cardSubtitle: note.description,
+    cardDetailedText: `Details: ${note.description}`,
+  }))
+
+  // setCustomContent(notes.map(note => {
+  const customContent = notes.map(note => {
+    return <div className="w-full">
+      {/* cardDetailedText */}
+      <div className="text-gray-800 text-left">
+        <p>{note.description}</p>
+      </div>
+      <div className="text-right mt-4">
+        <i
+          className="fas fa-trash text-gray-800 cursor-pointer mr-4"
+          onClick={() => { deleteNote(note._id) }}
+        ></i>
+        <i
+          className="fas fa-edit text-gray-800 cursor-pointer"
+          onClick={() => updateNote(note)}
+        ></i>
+      </div>
+    </div>
+  });
+
   return (
     <>
-      <AddNote />
-      <h2 className='text-2xl mt-8 font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-blue-500 to-yellow-500'>Your Notes</h2>
-      <div className="grid xl:grid-cols-4 md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-x-20">
-        {Array.isArray(notes) && notes.length > 0 ? (
-          notes.map((note) => (
-            <NoteItem key={note.id} updateNote={updateNote} note={note} />
-          ))
+      <button
+       type="button"
+        className="bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md uppercase font-bold shadow-md rounded-lg px-4 py-2"
+        onClick={() => navigate('/addnote')}
+      >
+        Add a Note
+      </button>
+      <h2 className='text-2xl mt-8 font-bold gradient-text'>Your Notes Timeline</h2>
+      {/* fullwidth */}
+      <div className="mt-6 y-6 w-full">
+        {items.length > 0 ? (
+          <Chrono items={items} mode="VERTICAL" useReadMore={true}
+            allowDynamicUpdate={true} hideControls={true}
+          >{customContent}</Chrono>
         ) : (
           <p className="mx-1">No notes found</p>
         )}
@@ -88,7 +140,7 @@ const Notes = () => {
                     Description
                   </label>
                   <textarea
-                   className="mt-1 p-2 w-full text-black border rounded-md"
+                    className="mt-1 p-2 w-full text-black border rounded-md"
                     value={note.edescription}
                     id="edescription"
                     name="edescription"

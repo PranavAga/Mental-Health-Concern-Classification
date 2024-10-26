@@ -1,9 +1,11 @@
-body{
-  background-color: #28231D;
+body {
+  background-image: radial-gradient(rgb(68, 76, 247) 0.5px, rgb(229, 229, 247) 0.5px);
+  background-size: 10px 10px;
 }
+
 .gradient-text {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, #EDB7ED, #82A0D8, #8DDFCB, #ECEE81);
+  background-image: linear-gradient(90deg, #ff0037, #ff809b, rgba(255,255,255,1))
 }

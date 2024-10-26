@@ -29,19 +29,19 @@ const NoteState = (props) => {
           _id: "1",
           title: "Note 1",
           description: "Description 1",
-          dueDate: "2021-09-30T18:30:00.000Z",
+          dueDate: "2023-10-30T18:30:00.000Z",
         },
         {
           _id: "2",
           title: "Note 2",
           description: "Description 2",
-          dueDate: "2021-09-30T18:30:00.000Z",
+          dueDate: "2023-10-30T18:30:00.000Z",
         },
         {
           _id: "3",
           title: "Note 3",
           description: "Description 3",
-          dueDate: "2021-09-30T18:30:00.000Z",
+          dueDate: "2023-10-30T18:30:00.000Z",
         },
       ]);
 
@@ -74,8 +74,10 @@ const NoteState = (props) => {
         dueDate,
       };
       setNotes([...notes, newNote]);
+      return { success: true };
     } catch (error) {
       console.error("Error adding note:", error);
+      return { success: false }
     }
   };
   // const json = await response.json();

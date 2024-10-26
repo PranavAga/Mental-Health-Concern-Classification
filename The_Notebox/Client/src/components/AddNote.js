@@ -1,21 +1,28 @@
 import React, { useContext, useState } from 'react';
 import noteContext from '../context/notes/noteContext';
 
-const AddNote = () => {
+const AddNote = (props) => {
   const context = useContext(noteContext);
   const { addNote } = context;
+  const {showAlert} = props;
 
   const [note, setNote] = useState({ title: '', description: '', dueDate: '' });
   
 
-  const handleclick = (e) => {
+  const handleclick = async (e) => {
     e.preventDefault();
-    addNote(note.title, note.description, note.dueDate);
-    setNote({
-      title: '',
-      description: '',
-      dueDate: '',
-    });
+    const result = await addNote(note.title, note.description, note.dueDate);
+    console.log('Note added:', result);
+    if (result.success) {
+      showAlert('Note added successfully', 'success');
+      setNote({
+        title: '',
+        description: '',
+        dueDate: '',
+      });
+    }else{
+      showAlert('Note not added', 'danger');
+    }
   };
 
   const onChange = (e) => {
@@ -23,10 +30,11 @@ const AddNote = () => {
   };
 
   return (
+    <div className='lg:mx-20 mx-8'>
     <div className="my-1 lg:my-3">
-     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-300 via-blue-500 to-yellow-500">Add a Note</h1>
+     <h1 className="text-2xl font-bold gradient-text">Add a Note</h1>
       <div className="my-4">
-        <label htmlFor="title" className="block text-lg font-medium text-gray-200">
+        <label htmlFor="title" className="block text-lg font-medium">
           Title
         </label>
         <input
@@ -40,7 +48,7 @@ const AddNote = () => {
         />
       </div>
       <div className="mb-3">
-        <label htmlFor="description" className="block text-lg font-medium text-gray-200">
+        <label htmlFor="description" className="block text-lg font-medium">
           Description
         </label>
         <textarea
@@ -54,7 +62,7 @@ const AddNote = () => {
         ></textarea>
       </div>
       <div className="mb-3">
-        <label htmlFor="dueDate" className="block text-lg font-medium text-gray-200">
+        <label htmlFor="dueDate" className="block text-lg font-medium">
           Due Date
         </label>
         <textarea
@@ -70,6 +78,7 @@ const AddNote = () => {
       <button type="button" className=" max-w-sm bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md uppercase font-bold shadow-md rounded-lg mx-auto px-4 py-2" onClick={handleclick}>
         Add note
       </button>
+    </div>
     </div>
   );
 };
