@@ -17,5 +17,5 @@ This tool analyzes the sentiment of input text and classifies it as either POSIT
 Run the script from the command line with your text as an argument:
 
 ```py
-    python sentiment-analysis.py "your text here"
+python sentiment-analysis.py "your text here"
 ```
