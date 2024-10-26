@@ -1,0 +1,11 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+i{
+    cursor: pointer;
+}
+body{
+    background-color: rgb(39, 39, 39);
+    color: white;
+}
