@@ -62,10 +62,11 @@ const NavBar = () => {
             )}
           </button>
         </div>
-        <div className={`lg:flex ${isMobileMenuOpen ? 'block' : 'hidden'} items-center gap-4`}>
+        <div className={`lg:flex ${isMobileMenuOpen ? 'block' : 'hidden'} lg:block items-center gap-4`}>
           <ul className="lg:flex items-center gap-4 justify-center text-md">
             <NavItem className="text-[#EDB7ED]" to="/" label="Home" currentPath={location.pathname} onClick={closeMobileMenu} />
             <NavItem className="text-[#82A0D8]" to="/about" label="About" currentPath={location.pathname} onClick={closeMobileMenu} />
+            <NavItem className="text-[#82A0D8]" to="/chat" label="Chat" currentPath={location.pathname} onClick={closeMobileMenu} />
           </ul>
           <div className="flex items-center">
             {token ? (
