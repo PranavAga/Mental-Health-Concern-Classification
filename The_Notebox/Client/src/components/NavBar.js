@@ -23,7 +23,7 @@ const NavBar = () => {
   return (
     <nav className="bg-[#28231D] p-4">
       <div className="container mx-auto flex items-center justify-between">
-        <Link to="/" className="gradient-text text-3xl font-bold">NOTEBOX</Link>
+        <Link to="/" className="gradient-text text-3xl font-bold">MINDPEERS JOURNAL</Link>
         <div className="lg:hidden">
           <button
             onClick={toggleMobileMenu}

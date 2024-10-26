@@ -157,7 +157,7 @@ const Notes = () => {
         </button>
         <button
           type="button"
-          className="mx-4 max-w-sm bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md uppercase font-bold shadow-md rounded-lg px-4 py-2"
+          className="mx-4 max-w-sm bg-gradient-to-r from-indigo-500 via-pink-500 to-yellow-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-600 focus:outline-none text-white text-md font-bold shadow-md rounded-lg px-4 py-2"
           onClick={() => fetchReport({ "inputs": notes.map(note=>note.title + "\n" + note.description) }).then(data => setResults(data))}
         >
           Generate Report
