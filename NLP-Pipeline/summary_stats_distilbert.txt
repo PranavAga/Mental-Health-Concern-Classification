@@ -1,0 +1,27 @@
+Summary Statistics for DistilBERT
+==================================================
+
+Timing Metrics:
+--------------------
+Model Load Time: 26.15 seconds
+Total Execution Time: 1091.91 seconds
+Average Time Per Text: 10.92 milliseconds
+Overall Processing Time: 1092.18 seconds
+
+Accuracy Metrics:
+--------------------
+Total Samples: 100000
+Correct Predictions: 33222
+Accuracy: 0.3322
+Average Confidence: 0.9893
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+    Negative       0.33      0.69      0.45     33211
+     Neutral       0.00      0.00      0.00     33651
+    Positive       0.33      0.31      0.32     33138
+
+    accuracy                           0.33    100000
+   macro avg       0.22      0.33      0.26    100000
+weighted avg       0.22      0.33      0.26    100000
