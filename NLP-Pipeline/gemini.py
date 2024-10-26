@@ -3,7 +3,7 @@ import json
 
 def analyze_mental_health(text):
     # Configure the API key
-    GOOGLE_API_KEY = 'AIzaSyBopZmei607ybOI4o5tPuyiKoH5My993v4'
+    GOOGLE_API_KEY = 'api_key'
     genai.configure(api_key=GOOGLE_API_KEY)
     
     # Initialize Gemini Pro
