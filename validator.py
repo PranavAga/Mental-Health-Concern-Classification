@@ -13,8 +13,11 @@ class ConcernDetails(BaseModel):
 
 class AnalysisResult(BaseModel):
     polarity: str
-    concerns: List[ConcernDetails]
+    concern: ConcernDetails
     progression: str
 
 class AnalysisResponse(BaseModel):
     results: List[AnalysisResult]
+
+class NoteAddInput(BaseModel):
+    note: str
