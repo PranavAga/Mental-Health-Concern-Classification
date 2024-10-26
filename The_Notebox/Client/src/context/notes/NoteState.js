@@ -11,17 +11,40 @@ const NoteState = (props) => {
   // Get all notes 
   const getNotes = async () => {
     try {
-      const response = await fetch(`${host}/api/notes/fetchnotes`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "auth-token": localStorage.getItem("token"),
+      // const response = await fetch(`${host}/api/notes/fetchnotes`, {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "auth-token": localStorage.getItem("token"),
+      //   },
+      // });
+      // if (response.ok) {
+      //   const json = await response.json();
+      //   setNotes(json);
+      // }
+
+      // TODO: currently mock
+      setNotes([
+        {
+          _id: "1",
+          title: "Note 1",
+          description: "Description 1",
+          dueDate: "2021-09-30T18:30:00.000Z",
         },
-      });
-      if (response.ok) {
-        const json = await response.json();
-        setNotes(json);
-      }
+        {
+          _id: "2",
+          title: "Note 2",
+          description: "Description 2",
+          dueDate: "2021-09-30T18:30:00.000Z",
+        },
+        {
+          _id: "3",
+          title: "Note 3",
+          description: "Description 3",
+          dueDate: "2021-09-30T18:30:00.000Z",
+        },
+      ]);
+
     } catch (error) {
       console.error("Error fetching notes:", error);
     } 
@@ -30,18 +53,27 @@ const NoteState = (props) => {
   // Add a note function 
   const addNote = async (title, description, dueDate) => {
     try {
-      const response = await fetch(`${host}/api/notes/addnotes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "auth-token": localStorage.getItem("token"),
-        },
-        body: JSON.stringify({ title, description, dueDate }),
-      });
-      if (response.ok) {
-        const newNote = await response.json();
-        setNotes([...notes, newNote]);
-      }
+      // const response = await fetch(`${host}/api/notes/addnotes`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "auth-token": localStorage.getItem("token"),
+      //   },
+      //   body: JSON.stringify({ title, description, dueDate }),
+      // });
+      // if (response.ok) {
+      //   const newNote = await response.json();
+      //   setNotes([...notes, newNote]);
+      // }
+
+      // TODO: currently mock
+      const newNote = {
+        _id: "4",
+        title,
+        description,
+        dueDate,
+      };
+      setNotes([...notes, newNote]);
     } catch (error) {
       console.error("Error adding note:", error);
     }
@@ -51,14 +83,17 @@ const NoteState = (props) => {
 
   // Delete a note 
   const deleteNote = async (id) => {
-    const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": localStorage.getItem("token"),
-      },
-    });
-    const json = response.json();
+    // const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
+    //   method: "DELETE",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     "auth-token": localStorage.getItem("token"),
+    //   },
+    // });
+    // const json = response.json();
+
+    // TODO: currently mock
+    const json = { success: true };
     console.log(json);
     //
     const newNotes = notes.filter((note) => note._id !== id);
@@ -68,14 +103,17 @@ const NoteState = (props) => {
   // Edit a note
   const editNote = async (id, title, description, dueDate) => {
     try {
-      const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "auth-token": localStorage.getItem("token")
-        },
-        body: JSON.stringify({ title, description, dueDate }),
-      });
+      // const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "auth-token": localStorage.getItem("token")
+      //   },
+      //   body: JSON.stringify({ title, description, dueDate }),
+      // });
+
+      // TODO: currently mock
+      const response = { ok: true };
       if (response.ok) {
         const updatedNotes = notes.map((note) =>
           note._id === id ? { ...note, title, description, dueDate } : note

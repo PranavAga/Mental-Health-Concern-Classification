@@ -11,19 +11,22 @@ const SignUp = (props) => {
         throw new Error("Passwords don't match");
       }
 
-      const response = await fetch('https://notebox-backend.vercel.app/api/auth/createuser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+      // const response = await fetch('https://notebox-backend.vercel.app/api/auth/createuser', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ name, email, password }),
+      // });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`HTTP error! Status: ${response.status}`);
+      // }
 
-      const json = await response.json();
+      // const json = await response.json();
+
+      // TODO: currently mock
+      const json = { success: true, authToken: 'mockToken' };
       console.log('Response:', json);
 
       if (json.success) {
