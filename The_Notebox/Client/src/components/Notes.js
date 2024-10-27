@@ -4,6 +4,52 @@ import { useNavigate } from 'react-router-dom';
 import { Chrono } from "react-chrono";
 import EditNote from './EditNote';
 
+import mockResults from './mockResults.json';
+
+import AnxietyIcon  from './svg/anxiety.svg';
+import DepressionIcon  from './svg/depression.svg';
+import StressIcon  from './svg/stress.svg';
+import CareerConfusionIcon  from './svg/career_confusion.svg';
+import EatingDisorderIcon  from './svg/eating_disorder.svg';
+import InsomniaIcon  from './svg/insomnia.svg';
+import PositiveOutlookIcon  from './svg/positive_outlook.svg';
+import HealthAnxietyIcon  from './svg/health_anxiety.svg';
+
+function getSVG(category) {
+  let svg
+  switch (category) {
+    case "Anxiety":
+      svg = AnxietyIcon 
+      break;
+    case "Depression":
+      svg = DepressionIcon 
+      break;
+    case "Stress":
+      svg = StressIcon 
+      break;
+    case "Career Confusion":
+      svg = CareerConfusionIcon 
+      break;
+    case "Eating Disorder":
+      svg = EatingDisorderIcon 
+      break;
+    case "Insomnia":
+      svg = InsomniaIcon 
+      break;
+    case "Positive Outlook":
+      svg = PositiveOutlookIcon 
+      break;
+    case "Health Anxiety":
+      svg = HealthAnxietyIcon 
+      break;
+    default:
+      svg = AnxietyIcon
+  }
+
+  // resize it
+  return <img src={svg} alt={category} className="w-6 h-6" />
+}
+
 function convertToRecentDate(date) {
   let title;
   const now = new Date();
@@ -115,22 +161,26 @@ const Notes = () => {
   }))
 
   const customContent = notes.map((note, index) => {
+
+    const polarityColor = results[index] ? results[index].polarity === "Positive" ? "green" : results[index].polarity === "Negative" ? "red" : "gray" : "gray";
+
     return <div className="w-full" key={note.id}>
       {/* cardDetailedText */}
       <div className="text-gray-800 text-left">
         <p>{note.description}</p>
       </div>
-
+      {/* {getSVG("Anxiety")} */}
       {/* results of the report */}
       {(index < results.length) && (
-        <div className="text-red-500 text-left">
-          <p>{results[index].polarity}</p>
+        <div className="text-left">
+          <p style={{ color: polarityColor }}>{results[index].polarity}</p>
           <p>{results[index].progression}</p>
           <ul>
             {results[index].concerns.map((concern, i) => (
               <li key={i}>{concern.concern} - {concern.category} - {concern.intensity}</li>
             ))}
           </ul>
+          {getSVG(results[index].concerns[0].category)}
         </div>
       )}
 
@@ -167,7 +217,7 @@ const Notes = () => {
               .catch(error => {
                 console.error("Error fetching report:", error);
                 alert("Server error. Please try again later.");
-                setResults([]);
+                setResults(mockResults);
               })
               .finally(() => setShowResultsLoader(false));
           }

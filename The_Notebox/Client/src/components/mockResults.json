@@ -1,0 +1,125 @@
+{
+    "results": [
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "I am feeling very low today",
+                    "category": "Depression",
+                    "intensity": 7
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "i feel i'm not putting enough work in",
+                    "category": "Career Confusion",
+                    "intensity": 5
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "stressed about my exams",
+                    "category": "Stress",
+                    "intensity": 7
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Positive",
+            "concerns": [
+                {
+                    "concern": "i'm hopeful",
+                    "category": "Positive Outlook",
+                    "intensity": 4
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Positive",
+            "concerns": [
+                {
+                    "concern": "we will win megathon",
+                    "category": "Positive Outlook",
+                    "intensity": 10
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "i didn't win megathon",
+                    "category": "Depression",
+                    "intensity": 5
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "can't live without",
+                    "category": "Depression",
+                    "intensity": 8
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "my stomach is paining",
+                    "category": "Health Anxiety",
+                    "intensity": 5
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "I am feeling very low today",
+                    "category": "Depression",
+                    "intensity": 7
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "very sad",
+                    "category": "Depression",
+                    "intensity": 8
+                }
+            ],
+            "progression": ""
+        },
+        {
+            "polarity": "Negative",
+            "concerns": [
+                {
+                    "concern": "i can't sleep remembering my ex",
+                    "category": "Insomnia",
+                    "intensity": 8
+                }
+            ],
+            "progression": ""
+        }
+    ]
+}

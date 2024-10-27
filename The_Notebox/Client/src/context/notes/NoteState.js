@@ -45,9 +45,9 @@ const NoteState = (props) => {
       if (!time){
         time = new Date().toISOString()
       }
-      if (!title){
-        title = new Date(time).toDateString()
-      }
+      // if (!title){
+      //   title = new Date(time).toDateString()
+      // }
 
       const response = await fetch(`http://localhost:8000/add_note/`, {
         method: "PUT",
