@@ -40,7 +40,7 @@ const AddNote = (props) => {
     <div className="my-1 lg:my-3">
      <h1 className="text-2xl font-bold gradient-text">Add a Note</h1>
       <div className="my-4">
-        <label htmlFor="title" className="block text-lg font-medium">
+        {/* <label htmlFor="title" className="block text-lg font-medium">
           Title
         </label>
         <input
@@ -51,7 +51,7 @@ const AddNote = (props) => {
           name="title"
           placeholder="Add a title.."
           onChange={onChange}
-        />
+        /> */}
       </div>
       <div className="mb-3">
         <label htmlFor="description" className="block text-lg font-medium">

@@ -11,39 +11,46 @@ const NoteState = (props) => {
   // Get all notes 
   const getNotes = async () => {
     try {
-      // const response = await fetch(`${host}/api/notes/fetchnotes`, {
-      //   method: "GET",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "auth-token": localStorage.getItem("token"),
+      const response = await fetch('http://localhost:8000/notes/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': localStorage.getItem('token')
+        },
+      });
+      const data = await response.json()
+      console.log(data)
+      setNotes(
+        data.map((obj, index) => {
+          return {
+              ...obj,             // Spread the existing properties
+              title: `Note ${index + 1}`  // Add the new Note property
+          };
+        })
+      )
+      // const data = await response.json();
+      // console.log(data)
+      // setNotes(data.notes);
+      // setNotes([
+      //   {
+      //     _id: "1",
+      //     title: "Note 1",
+      //     description: "Description 1",
+      //     dueDate: "2023-10-30T18:30:00.000Z",
       //   },
-      // });
-      // if (response.ok) {
-      //   const json = await response.json();
-      //   setNotes(json);
-      // }
-
-      // TODO: currently mock
-      setNotes([
-        {
-          _id: "1",
-          title: "Note 1",
-          description: "Description 1",
-          dueDate: "2023-10-30T18:30:00.000Z",
-        },
-        {
-          _id: "2",
-          title: "Note 2",
-          description: "Description 2",
-          dueDate: "2023-10-30T18:30:00.000Z",
-        },
-        {
-          _id: "3",
-          title: "Note 3",
-          description: "Description 3",
-          dueDate: "2023-10-30T18:30:00.000Z",
-        },
-      ]);
+      //   {
+      //     _id: "2",
+      //     title: "Note 2",
+      //     description: "Description 2",
+      //     dueDate: "2023-10-30T18:30:00.000Z",
+      //   },
+      //   {
+      //     _id: "3",
+      //     title: "Note 3",
+      //     description: "Description 3",
+      //     dueDate: "2023-10-30T18:30:00.000Z",
+      //   },
+      // ]);
 
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -53,27 +60,20 @@ const NoteState = (props) => {
   // Add a note function 
   const addNote = async (title, description, dueDate) => {
     try {
-      // const response = await fetch(`${host}/api/notes/addnotes`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "auth-token": localStorage.getItem("token"),
-      //   },
-      //   body: JSON.stringify({ title, description, dueDate }),
-      // });
-      // if (response.ok) {
-      //   const newNote = await response.json();
-      //   setNotes([...notes, newNote]);
-      // }
+      const note = description
+      const response = await fetch(`http://localhost:8000/notes/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ note }),
+      });
+      if (response.ok) {
+        const newNote = await response.json();
+        setNotes([...notes, newNote]);
+      }
 
-      // TODO: currently mock
-      const newNote = {
-        _id: "4",
-        title,
-        description,
-        dueDate,
-      };
-      setNotes([...notes, newNote]);
       return { success: true };
     } catch (error) {
       console.error("Error adding note:", error);
@@ -83,22 +83,21 @@ const NoteState = (props) => {
   // const json = await response.json();
   // console.log(json);
 
-  // Delete a note 
+  // TODO: Delete a note 
   const deleteNote = async (id) => {
-    // const response = await fetch(`${host}/api/notes/deletenote/${id}`, {
-    //   method: "DELETE",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "auth-token": localStorage.getItem("token"),
-    //   },
-    // });
-    // const json = response.json();
+    console.log("deleting",id)
+    const response = await fetch(`http://localhost:8000/notes/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": localStorage.getItem("token"),
+      },
+    });
+    const json = response.json();
 
-    // TODO: currently mock
-    const json = { success: true };
     console.log(json);
     //
-    const newNotes = notes.filter((note) => note._id !== id);
+    const newNotes = notes.filter((note) => note.id !== id);
     setNotes(newNotes);
   };
 

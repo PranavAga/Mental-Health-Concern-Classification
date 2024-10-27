@@ -95,7 +95,7 @@ const Notes = () => {
 
   const updateNote = (currentNote) => {
     setNote({
-      id: currentNote._id,
+      id: currentNote.id,
       etitle: currentNote.title,
       edescription: currentNote.description,
       edueDate: currentNote.dueDate,
@@ -113,7 +113,7 @@ const Notes = () => {
   }))
 
   const customContent = notes.map((note, index) => {
-    return <div className="w-full" key={note._id}>
+    return <div className="w-full" key={note.id}>
       {/* cardDetailedText */}
       <div className="text-gray-800 text-left">
         <p>{note.description}</p>
@@ -135,7 +135,7 @@ const Notes = () => {
       <div className="text-right mt-4">
         <i
           className="fas fa-trash text-gray-800 cursor-pointer mr-4"
-          onClick={() => deleteNote(note._id)}
+          onClick={() => deleteNote(note.id)}
         ></i>
         <i
           className="fas fa-edit text-gray-800 cursor-pointer"

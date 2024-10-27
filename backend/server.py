@@ -1,8 +1,8 @@
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from validator import AnalysisInput, AnalysisResult, NoteAddInput
-from call_models import getConcerns, getPolarity, getProgression
+from validator import AnalysisInput, AnalysisResult, NoteAddInput, ConcernDetails
+from call_models import analyze_mental_health
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
@@ -36,21 +36,9 @@ db = client.note_db
 collection = db.notes
 
 """
-Input Sequence:
-Day 1: "I can’t sleep well and I feel very low."
-Polarity: Negative
-Extracted Concern 1: "can’t sleep well" → Category: "Insomnia" → Intensity: 6/10
-Extracted Concern 2: "feel very low" → Category: "Depression" → Intensity: 7/10
-Timeline Shift: Sentiment remains negative.
-Day 7: "I feel a bit better but still anxious."
-Polarity: Neutral
-Extracted Concern 1: "still anxious" → Category: "Anxiety" → Intensity: 4/10
-Timeline Shift: Signs of improvement from Depression to Anxiety.
-
-
 {
   "inputs": [
-    "I can’t sleep well and I feel very low.",
+    "I can’t sleep well",
     "I feel a bit better but still anxious."
   ]
 }
@@ -58,11 +46,11 @@ Timeline Shift: Signs of improvement from Depression to Anxiety.
 Output: {
     array of {
         polarity,
-        array of {
+        [{
             concern,
             category,
             intensity
-        }
+        }]
 
         progression
     }
@@ -73,23 +61,25 @@ def mental_health_pipeline(input_data: AnalysisInput):
     results = []
 
     for user_input in input_data.inputs:
-        polarity = getPolarity(user_input)
-
-        concerns = getConcerns(user_input)
-
-        progression = getProgression(results, polarity, concerns)
+        result = analyze_mental_health(user_input)
 
         results.append(AnalysisResult(
-            polarity = polarity,
-            concerns = concerns,
-            progression = progression
+            polarity = "Neutral",
+            concerns = [ConcernDetails(
+                concern=result["phrase"],
+                category=result["category"],
+                intensity=str(result["intensity"])
+            )
+            ],
+            progression = ""
         ))
 
     return {"results": results}
 
 
-@app.post("/notes/")
+@app.post("/notes")
 def add_note(note_input:NoteAddInput):
+    print(note_input)
     print(note_input.note)
     result = collection.insert_one({
         "description": note_input.note,
@@ -100,7 +90,8 @@ def add_note(note_input:NoteAddInput):
     if not result.inserted_id:
         raise HTTPException(status_code=500, detail="Failed to add note")
     
-    return {'added': True}
+    return {"id": str(result.inserted_id), "description": note_input.note,
+        "time": datetime.now().isoformat()}
 
 @app.get("/notes/")
 def get_all_notes():

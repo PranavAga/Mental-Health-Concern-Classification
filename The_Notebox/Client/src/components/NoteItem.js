@@ -19,12 +19,12 @@ const NoteItem = (props) => {
       <div style={{ backgroundColor: bgColor }} className='p-4 rounded-lg mt-8'>
         <h5 className="text-2xl text-gray-800 font-bold mb-2">{note.title}</h5>
         <p className="text-xl text-gray-800">{note.description}.</p>
-        <h6 className="text-lg text-right font-semibold text-gray-700 mb-2">Due: {note.dueDate}</h6>
+        {/* <h6 className="text-lg text-right font-semibold text-gray-700 mb-2">Due: {note.time }</h6> */}
         <div className="text-right mt-4">
           <i
             className="fas fa-trash text-gray-800 cursor-pointer mr-4"
-            onClick={() => {
-              deleteNote(note._id);
+            onClick={() => { console.log("d");
+              deleteNote(note.id);
             }}
           ></i>
           <i
