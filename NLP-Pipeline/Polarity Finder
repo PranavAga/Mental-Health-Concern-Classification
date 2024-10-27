@@ -1,0 +1,93 @@
+import pandas as pd
+import torch
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+from collections import defaultdict
+from tqdm import tqdm
+
+# Load dataset
+df = pd.read_csv('/kaggle/input/mental-health-corrected-dataset-2/mental_health_corrected_dataset_2.csv')
+df = df[['User Input', 'Polarity']].dropna()
+df['Polarity'] = df['Polarity'].apply(lambda x: x.lower().strip())
+
+# Encode Polarity labels
+label_encoder = LabelEncoder()
+df['Polarity'] = label_encoder.fit_transform(df['Polarity'])
+
+# Split data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(df['User Input'], df['Polarity'], test_size=0.2, random_state=42)
+
+# TF-IDF Vectorization
+tfidf = TfidfVectorizer(max_features=3000, ngram_range=(1, 2))
+X_train_tfidf = tfidf.fit_transform(X_train)
+X_test_tfidf = tfidf.transform(X_test)
+
+# Initialize Naive Bayes classifier
+model = MultinomialNB()
+
+# Train the model
+model.fit(X_train_tfidf, y_train)
+
+# Evaluate the model on the test set
+y_pred = model.predict(X_test_tfidf)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Test Accuracy: {accuracy * 100:.2f}%")
+
+# Initialize user sentiment history
+user_sentiment_history = defaultdict(list)
+
+def detect_shift(user_name, current_sentiment):
+    """
+    Function to detect sentiment shifts for a user based on their history.
+    """
+    if len(user_sentiment_history[user_name]) > 1:
+        previous_sentiment = user_sentiment_history[user_name][-2]
+        if current_sentiment != previous_sentiment:
+            shift = "improving" if current_sentiment > previous_sentiment else "worsening"
+            print(f"Shift detected for {user_name}: {shift} (Previous: {previous_sentiment}, Current: {current_sentiment})")
+        else:
+            print(f"No shift detected for {user_name}: Sentiment remains {current_sentiment}")
+    else:
+        print(f"Initial sentiment for {user_name}: {current_sentiment}")
+
+def dynamic_input():
+    """
+    Function to dynamically take inputs from users, track sentiments, and detect shifts.
+    """
+    while True:
+        # Ask for user name or option to exit
+        user_name = input("Enter your name (or type 'exit' to quit, 'switch' to change user): ").strip()
+
+        # Exit the program
+        if user_name.lower() == 'exit':
+            print("Exiting the program. Goodbye!")
+            break
+        # Switch to another user
+        elif user_name.lower() == 'switch':
+            continue
+        
+        # Capture user input dynamically
+        while True:
+            input_text = input(f"{user_name}, enter your input (or type 'done' to finish, 'switch' to switch user): ").strip()
+            
+            # Check if the user wants to finish or switch users
+            if input_text.lower() == 'done':
+                print(f"{user_name} has finished inputting.\n")
+                break
+            elif input_text.lower() == 'switch':
+                print("Switching to another user...\n")
+                break
+            
+            # Transform the input to match TF-IDF vector format and predict sentiment
+            input_tfidf = tfidf.transform([input_text])
+            sentiment = model.predict(input_tfidf)[0]
+            user_sentiment_history[user_name].append(sentiment)
+            
+            # Display the prediction and check for sentiment shifts
+            detect_shift(user_name, sentiment)
+
+# Run the dynamic input function
+dynamic_input()
