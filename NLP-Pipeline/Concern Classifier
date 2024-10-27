@@ -1,0 +1,116 @@
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, Dataset
+from transformers import BertTokenizer, BertModel
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score
+from tqdm import tqdm
+
+# Load dataset
+data = pd.read_csv('/kaggle/input/mental-health-corrected-dataset-2/mental_health_corrected_dataset_2.csv')
+categories = ["Anxiety", "Career Confusion", "Depression", "Eating Disorder", 
+              "Health Anxiety", "Insomnia", "Positive Outlook", "Stress"]
+
+# Encode labels
+data['Category'] = data['Category'].astype('category')
+data['Category_Code'] = data['Category'].cat.codes
+num_labels = len(data['Category'].unique())
+
+# BERT Tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+# Custom Dataset Class for BERT model
+class MentalHealthDataset(Dataset):
+    def __init__(self, data):
+        self.data = data
+        self.labels = data['Category_Code'].values
+        self.texts = list(data['Extracted Concern'])
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        text = self.texts[idx]
+        label = self.labels[idx]
+        encoding = tokenizer(text, padding='max_length', truncation=True, max_length=128, return_tensors='pt')
+        input_ids = encoding['input_ids'].flatten()
+        attention_mask = encoding['attention_mask'].flatten()
+        # Ensure label is a Long tensor
+        return {
+            'input_ids': input_ids, 
+            'attention_mask': attention_mask, 
+            'label': torch.tensor(label, dtype=torch.long)
+        }
+
+# DataLoader for BERT
+dataset = MentalHealthDataset(data)
+train_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+
+# Define BERT Model
+class MentalHealthClassifier(nn.Module):
+    def __init__(self, num_labels):
+        super(MentalHealthClassifier, self).__init__()
+        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        self.dropout = nn.Dropout(0.3)
+        self.linear = nn.Linear(self.bert.config.hidden_size, num_labels)
+    
+    def forward(self, input_ids, attention_mask):
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        pooled_output = outputs.pooler_output
+        output = self.dropout(pooled_output)
+        return self.linear(output)
+
+# Initialize Model, Optimizer, Loss for BERT
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = MentalHealthClassifier(num_labels=num_labels).to(device)
+optimizer = optim.Adam(model.parameters(), lr=2e-5)
+criterion = nn.CrossEntropyLoss()
+
+# Training Loop for BERT with Progress Bar
+epochs = 3
+for epoch in range(epochs):
+    model.train()
+    total_loss = 0
+    progress_bar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{epochs}', leave=False)
+    
+    for batch in progress_bar:
+        # Ensure all tensors are on the correct device and have correct dtype
+        input_ids = batch['input_ids'].to(device)
+        attention_mask = batch['attention_mask'].to(device)
+        labels = batch['label'].to(device)
+        
+        optimizer.zero_grad()
+        outputs = model(input_ids, attention_mask)
+        
+        # Ensure outputs and labels have correct shape and dtype
+        outputs = outputs.view(-1, num_labels)
+        labels = labels.view(-1)
+        
+        loss = criterion(outputs, labels)
+        total_loss += loss.item()
+        loss.backward()
+        optimizer.step()
+        
+        progress_bar.set_postfix(loss=loss.item())
+    
+    avg_loss = total_loss / len(train_loader)
+    print(f"Epoch {epoch+1}/{epochs}, BERT Loss: {avg_loss:.4f}")
+
+# Naive Bayes Classification remains the same
+vectorizer = CountVectorizer()
+X_nb = vectorizer.fit_transform(data['Extracted Concern'])
+y_nb = data['Category_Code']
+
+split_index = int(0.8 * len(data))
+X_train_nb, X_test_nb = X_nb[:split_index], X_nb[split_index:]
+y_train_nb, y_test_nb = y_nb[:split_index], y_nb[split_index:]
+
+nb_model = MultinomialNB()
+nb_model.fit(X_train_nb, y_train_nb)
+
+y_pred_nb = nb_model.predict(X_test_nb)
+nb_accuracy = accuracy_score(y_test_nb, y_pred_nb)
+print(f"Naive Bayes Accuracy: {nb_accuracy:.4f}")
