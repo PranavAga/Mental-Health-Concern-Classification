@@ -1,15 +1,21 @@
 from validator import ConcernDetails
 import google.generativeai as genai
 import json
+import os
+from dotenv import load_dotenv
+
 
 def analyze_mental_health(text):
+    # Load environment variables from .env file
+    load_dotenv()
+
     # Configure the API key
-    GOOGLE_API_KEY = 'api_key'
+    GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
     genai.configure(api_key=GOOGLE_API_KEY)
-    
+
     # Initialize Gemini Pro
     model = genai.GenerativeModel('gemini-pro')
-    
+
     # Create the prompt template
     prompt = f"""
     Analyze this text: "{text}"
@@ -26,10 +32,11 @@ def analyze_mental_health(text):
     # Generate response and get the text content
     response = model.generate_content(prompt)
     response_text = response.text.strip()
-    
+
     # Clean the response text (remove any markdown formatting if present)
-    response_text = response_text.replace('```json', '').replace('```', '').strip()
-    
+    response_text = response_text.replace(
+        '```json', '').replace('```', '').strip()
+
     try:
         # Parse the JSON response
         result = json.loads(response_text)
@@ -39,4 +46,3 @@ def analyze_mental_health(text):
             "error": f"Failed to parse response: {str(e)}",
             "raw_response": response_text
         }
-
