@@ -1,7 +1,10 @@
 import React, { useContext } from 'react';
 import noteContext from '../context/notes/noteContext';
 
-const EditNode = ({ note, setShowEditNote, setNote }) => {
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+const EditNote = ({ note, setShowEditNote, setNote }) => {
   const context = useContext(noteContext);
   const { editNote } = context;
 
@@ -10,7 +13,7 @@ const EditNode = ({ note, setShowEditNote, setNote }) => {
   };
 
   const handleclick = (e) => {
-    editNote(note.id, note.etitle, note.edescription, note.edueDate);
+    editNote(note.id, note.title, note.description, note.time);
     setShowEditNote(false);
   };
 
@@ -30,44 +33,59 @@ const EditNode = ({ note, setShowEditNote, setNote }) => {
             <div className="bg-[#28231D] px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div className="container">
                 <div className="mb-3">
-                  <label htmlFor="etitle" className="block text-lg font-medium text-[#ECEE81]">
+                  <label htmlFor="title" className="block text-lg font-medium text-[#ECEE81]">
                     Title
                   </label>
                   <input
                     type="text"
-                    value={note.etitle}
+                    value={note.title}
                     className="mt-1 p-2 text-black w-full border rounded-md"
-                    id="etitle"
-                    name="etitle"
+                    id="title"
+                    name="title"
                     placeholder="Add a title.."
                     onChange={onChange}
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="edescription" className="block text-lg font-medium text-[#82A0D8]">
+                  <label htmlFor="description" className="block text-lg font-medium text-[#82A0D8]">
                     Description
                   </label>
                   <textarea
                     className="mt-1 p-2 w-full text-black border rounded-md"
-                    value={note.edescription}
-                    id="edescription"
-                    name="edescription"
+                    value={note.description}
+                    id="description"
+                    name="description"
                     rows="1"
                     onChange={onChange}
                   ></textarea>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="edueDate" className="block text-lg font-medium text-[#EDB7ED]">
+                {/* <div className="mb-3">
+                  <label htmlFor="time" className="block text-lg font-medium text-[#EDB7ED]">
                     Date
                   </label>
                   <textarea
                     className="mt-1 p-2 text-black w-full border rounded-md"
-                    value={note.edueDate}
-                    id="edueDate"
-                    name="edueDate"
+                    value={note.time}
+                    id="time"
+                    name="time"
                     rows="1"
                     onChange={onChange}
                   ></textarea>
+                </div> */}
+                <div className="mb-3">
+                  <label htmlFor="time" className="block text-lg font-medium text-[#EDB7ED]">
+                    Date
+                  </label>
+                  <DatePicker
+                    selected={new Date(note.time)}
+                    onChange={(date) => setNote({ ...note, time: date })}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={15}
+                    timeCaption="time"
+                    dateFormat="MMMM d, yyyy h:mm aa"
+                    className="mt-1 p-2 text-black w-full border rounded-md"
+                  />
                 </div>
               </div>
             </div>
@@ -94,4 +112,4 @@ const EditNode = ({ note, setShowEditNote, setNote }) => {
   );
 }
 
-export default EditNode;
+export default EditNote;

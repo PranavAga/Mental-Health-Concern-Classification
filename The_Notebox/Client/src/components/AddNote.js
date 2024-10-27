@@ -11,20 +11,20 @@ const AddNote = (props) => {
 
   const [note, setNote] = useState({ title: '', description: '', 
     // in ISO 8601 format
-      dueDate: new Date().toISOString()
+      time: new Date().toISOString()
   });
   
 
   const handleclick = async (e) => {
     e.preventDefault();
-    const result = await addNote(note.title, note.description, note.dueDate);
-    console.log('Note added:', result);
+    const result = await addNote(note.title, note.description, note.time);
     if (result.success) {
+      console.log('Note added:', result);
       showAlert('Note added successfully', 'success');
       setNote({
         title: '',
         description: '',
-        dueDate: '',
+        time: '',
       });
     }else{
       showAlert('Note not added', 'danger');
@@ -40,7 +40,7 @@ const AddNote = (props) => {
     <div className="my-1 lg:my-3">
      <h1 className="text-2xl font-bold gradient-text">Add a Note</h1>
       <div className="my-4">
-        {/* <label htmlFor="title" className="block text-lg font-medium">
+        <label htmlFor="title" className="block text-lg font-medium">
           Title
         </label>
         <input
@@ -51,7 +51,7 @@ const AddNote = (props) => {
           name="title"
           placeholder="Add a title.."
           onChange={onChange}
-        /> */}
+        />
       </div>
       <div className="mb-3">
         <label htmlFor="description" className="block text-lg font-medium">
@@ -68,25 +68,25 @@ const AddNote = (props) => {
         ></textarea>
       </div>
       <div className="mb-3">
-        <label htmlFor="dueDate" className="block text-lg font-medium">
+        <label htmlFor="time" className="block text-lg font-medium">
           Date
         </label>
         {/* <textarea
           className="mt-1 p-2 text-black w-full border rounded-md"
-          value={note.dueDate}
-          id="dueDate"
-          name="dueDate"
+          value={note.time}
+          id="time"
+          name="time"
           placeholder="Date"
           rows="1"
           onChange={onChange}
         ></textarea> */}
         <DatePicker
         className='mt-1 p-2 text-black w-full border rounded-md'
-          selected={note.dueDate? new Date(note.dueDate): new Date()}
+          selected={note.time? new Date(note.time): new Date()}
           onChange={(date) => {
             setNote({
             ...note,
-            dueDate: date.toISOString(),
+            time: date.toISOString(),
           })
         }}
           showTimeSelect

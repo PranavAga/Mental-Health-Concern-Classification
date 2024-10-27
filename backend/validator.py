@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from typing import List
+from typing import Optional
+from datetime import datetime
 
 # Input model
 class AnalysisInput(BaseModel):
@@ -9,7 +11,7 @@ class AnalysisInput(BaseModel):
 class ConcernDetails(BaseModel):
     concern: str
     category: str
-    intensity: int
+    intensity: str
 
 class AnalysisResult(BaseModel):
     polarity: str
@@ -20,4 +22,6 @@ class AnalysisResponse(BaseModel):
     results: List[AnalysisResult]
 
 class NoteAddInput(BaseModel):
-    note: str
+    title: Optional[str] = None
+    description: str
+    time: Optional[str] = datetime.now().isoformat()

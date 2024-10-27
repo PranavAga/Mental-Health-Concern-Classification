@@ -4,6 +4,24 @@
 ## Introduction
 Meet **MindPeers Journal**—a smarter way to capture and understand your daily thoughts, emotions, and growth. This innovative journaling app combines note-taking with mental health analytics. With features like mood tracking, sentiment analysis, and a personalized dashboard, MindPeers Journal empowers users to visualize emotional patterns, set personal goals, and stay consistent on their self-reflective journey. Designed for both simplicity and insight, MindPeers Journal is your digital companion for building mindfulness and self-awareness, one entry at a time.
 
+## How to run
+
+to run python server
+```bash
+cd backend
+# install dependencies
+pip install -r requirements.txt
+uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+to run frontend
+```bash
+cd frontend
+# install dependencies
+npm install
+npm run start
+```
+
 ## App Features
 - [ ] User Authentication & Profile
   - [ ] Sign-Up/Login: Secure login with options for email or OAuth (Google, Facebook).

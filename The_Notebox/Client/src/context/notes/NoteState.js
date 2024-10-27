@@ -2,9 +2,9 @@ import React from "react";
 import { useState } from "react";
 import NoteContext from "./noteContext";
 
-const NoteState = (props) => {
-  const host = "https://notebox-backend.vercel.app";
+import mockNotes from "./notes.json"
 
+const NoteState = (props) => {
   const notesInitial = [];
   const [notes, setNotes] = useState(notesInitial);
 
@@ -18,39 +18,20 @@ const NoteState = (props) => {
           'x-auth-token': localStorage.getItem('token')
         },
       });
-      const data = await response.json()
-      console.log(data)
-      setNotes(
-        data.map((obj, index) => {
-          return {
-              ...obj,             // Spread the existing properties
-              title: `Note ${index + 1}`  // Add the new Note property
-          };
-        })
-      )
-      // const data = await response.json();
-      // console.log(data)
-      // setNotes(data.notes);
-      // setNotes([
-      //   {
-      //     _id: "1",
-      //     title: "Note 1",
-      //     description: "Description 1",
-      //     dueDate: "2023-10-30T18:30:00.000Z",
-      //   },
-      //   {
-      //     _id: "2",
-      //     title: "Note 2",
-      //     description: "Description 2",
-      //     dueDate: "2023-10-30T18:30:00.000Z",
-      //   },
-      //   {
-      //     _id: "3",
-      //     title: "Note 3",
-      //     description: "Description 3",
-      //     dueDate: "2023-10-30T18:30:00.000Z",
-      //   },
-      // ]);
+      let allNotes
+      if (!response.ok) {
+        allNotes = mockNotes
+        console.log("fetching notes from mock", allNotes)
+      }else{
+        const data = await response.json()
+        console.log("fetching notes", data)
+        allNotes = data
+      }
+
+      // sort notes by time
+      allNotes.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+      setNotes(allNotes);
 
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -58,20 +39,29 @@ const NoteState = (props) => {
   };
 
   // Add a note function 
-  const addNote = async (title, description, dueDate) => {
+  const addNote = async (title, description, time) => {
     try {
-      const note = description
-      const response = await fetch(`http://localhost:8000/notes/`, {
-        method: "POST",
+      // try to fill fields
+      if (!time){
+        time = new Date().toISOString()
+      }
+      if (!title){
+        title = new Date(time).toDateString()
+      }
+
+      const response = await fetch(`http://localhost:8000/add_note/`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "auth-token": localStorage.getItem("token"),
         },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({ title, description, time }),
       });
       if (response.ok) {
         const newNote = await response.json();
         setNotes([...notes, newNote]);
+      } else {
+        throw new Error("Failed to add note");
       }
 
       return { success: true };
@@ -102,22 +92,23 @@ const NoteState = (props) => {
   };
 
   // Edit a note
-  const editNote = async (id, title, description, dueDate) => {
+  const editNote = async (id, title, description, time) => {
     try {
-      // const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "auth-token": localStorage.getItem("token")
-      //   },
-      //   body: JSON.stringify({ title, description, dueDate }),
-      // });
+      const response = await fetch(`http://localhost:8000/edit_note/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("token")
+        },
+        body: JSON.stringify({ title, description, time }),
+      });
 
-      // TODO: currently mock
-      const response = { ok: true };
       if (response.ok) {
+        const json = await response.json();
+        console.log(json);
+        
         const updatedNotes = notes.map((note) =>
-          note._id === id ? { ...note, title, description, dueDate } : note
+          note._id === id ? { ...note, title, description, time } : note
         );
         setNotes(updatedNotes);
       }

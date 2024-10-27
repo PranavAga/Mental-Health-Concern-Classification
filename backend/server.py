@@ -12,6 +12,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost",
+    "http://localhost:8000",
     "http://localhost:8080",
     "http://localhost:3000",
 ]
@@ -62,35 +63,45 @@ def mental_health_pipeline(input_data: AnalysisInput):
     for user_input in input_data.inputs:
         result = analyze_mental_health(user_input)
 
-        results.append(AnalysisResult(
-            polarity = "Neutral",
-            concerns = [ConcernDetails(
-                concern=result["phrase"],
-                category=result["category"],
-                intensity=str(result["intensity"])
-            )
-            ],
-            progression = ""
-        ))
+        # results.append(AnalysisResult(
+        #     polarity = result["polarity"],
+        #     concerns = [ConcernDetails(
+        #         concern=result["phrase"],
+        #         category=result["category"],
+        #         intensity=str(result["intensity"])
+        #     )
+        #     ],
+        #     progression = ""
+        # ))
+
+        results.append({
+            "polarity": result.get("polarity","Neutral"),
+            "concerns": [{
+                "concern": result.get("phrase","-"),
+                "category": result.get("category","Stress"),
+                "intensity": result.get("intensity",5)
+            }],
+            "progression": ""
+        })
 
     return {"results": results}
 
 
-@app.post("/notes")
+@app.put("/add_note/")
 def add_note(note_input:NoteAddInput):
     print(note_input)
-    print(note_input.note)
-    result = collection.insert_one({
-        "description": note_input.note,
-        "time": datetime.now().isoformat()
-    })
+    note ={
+        "title": note_input.title,
+        "description": note_input.description,
+        "time": note_input.time
+    }
+    result = collection.insert_one(note)
     print(result)
 
     if not result.inserted_id:
         raise HTTPException(status_code=500, detail="Failed to add note")
     
-    return {"id": str(result.inserted_id), "description": note_input.note,
-        "time": datetime.now().isoformat()}
+    return {"id": str(result.inserted_id)}
 
 @app.get("/notes/")
 def get_all_notes():
@@ -107,3 +118,32 @@ def delete_note(note_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Note not found")
     return {"message": "Note deleted successfully"}
+
+@app.put("/edit_note/{note_id}")
+def edit_note(note_id: str, note_input:NoteAddInput):
+    note ={
+        "title": note_input.title,
+        "description": note_input.description,
+        "time": note_input.time
+    }
+    result = collection.update_one({"_id": ObjectId(note_id)}, {"$set": note})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return {"message": "Note updated successfully"}
+
+def test_run():
+    from pprint import pprint
+    # view all notes
+    pprint(get_all_notes())
+    # add a note
+    pprint(add_note(NoteAddInput(title="soham",description="soham: I am feeling very low today")))
+    # view all notes
+    pprint(get_all_notes())
+    # delete a note
+    noteid = input("Enter the note id to delete: ")
+    pprint(delete_note(noteid))
+    # view all notes
+    pprint(get_all_notes())
+
+if __name__ == "__main__":
+    test_run()

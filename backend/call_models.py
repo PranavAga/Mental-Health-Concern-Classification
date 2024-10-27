@@ -24,9 +24,10 @@ def analyze_mental_health(text):
     - "phrase": only the specific words indicating the mental health concern
     - "category": exactly one of: Anxiety, Career Confusion, Depression, Eating Disorder, Health Anxiety, Insomnia, Positive Outlook, Stress
     - "intensity": a number from 1-10 representing severity
+    - "polarity": either "Positive", "Neutral", or "Negative"
     
     Example response format:
-    {{"phrase": "can't sleep at night", "category": "Insomnia", "intensity": 7}}
+    {{"phrase": "can't sleep at night", "category": "Insomnia", "intensity": 7, "polarity": "Negative"}}
     """
 
     # Generate response and get the text content
