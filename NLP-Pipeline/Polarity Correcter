@@ -1,0 +1,43 @@
+import pandas as pd
+from transformers import pipeline
+import torch
+from tqdm import tqdm
+
+# Determine if a GPU is available and set the device accordingly
+device = 0 if torch.cuda.is_available() else -1
+
+# Load the dataset
+file_path = 'mental_health_dataset.csv'  # Path to the dataset
+data = pd.read_csv(file_path)
+
+# Initialize the sentiment analysis pipeline with appropriate device
+sentiment_analyzer = pipeline('sentiment-analysis', model='distilbert-base-uncased-finetuned-sst-2-english', device=device)
+
+# Function to get sentiment from the model and map it to 'Positive', 'Negative', or 'Neutral'
+def get_corrected_polarity(text):
+    result = sentiment_analyzer(text)[0]  # Analyze sentiment
+    label = result['label']
+    # Map model output to required polarity format
+    if label == 'NEGATIVE':
+        return 'Negative'
+    elif label == 'POSITIVE':
+        return 'Positive'
+    else:
+        return 'Neutral'
+
+# Apply the function to the 'User Input' column with a progress bar
+tqdm.pandas(desc="Correcting Polarity")
+data['Corrected Polarity'] = data['User Input'].progress_apply(get_corrected_polarity)
+
+# Compare original and corrected polarity
+data['Polarity_Match'] = data['Polarity'] == data['Corrected Polarity']
+
+# Show mismatches (if any)
+mismatches = data[~data['Polarity_Match']]
+print("Mismatched entries:")
+print(mismatches[['User Input', 'Polarity', 'Corrected Polarity']])
+
+# Save the corrected dataset
+data.to_csv('corrected_mental_health_dataset.csv', index=False)
+
+print("Polarity correction complete. Saved as 'corrected_mental_health_dataset.csv'.")
