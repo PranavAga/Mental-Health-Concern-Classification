@@ -1,0 +1,138 @@
+
+import pandas as pd
+import numpy as np
+from transformers import pipeline
+from tqdm import tqdm
+
+def load_and_sample_data(file_path, sample_size=1):
+    """
+    Load the dataset and take a 5% sample
+    """
+    df = pd.read_csv(file_path)
+    sampled_df = df.sample(frac=sample_size, random_state=42)
+    print(f"Total samples in dataset: {len(df)}")
+    print(f"Samples being processed: {len(sampled_df)}")
+    return sampled_df
+
+def setup_classifier():
+    """
+    Initialize the zero-shot classification pipeline
+    """
+    classifier = pipeline(
+        "zero-shot-classification",
+        model="facebook/bart-large-mnli",
+        device="cuda" if torch.cuda.is_available() else "cpu"
+    )
+    return classifier
+
+def get_category_labels():
+    """
+    Define the possible category labels
+    """
+    return [
+        'Anxiety',
+        'Career Confusion',
+        'Depression',
+        'Eating Disorder',
+        'Health Anxiety',
+        'Insomnia',
+        'Positive Outlook',
+        'Stress'
+    ]
+
+def predict_category(text, classifier, candidate_labels):
+    """
+    Predict the most appropriate category for a given text
+    """
+    try:
+        result = classifier(
+            text,
+            candidate_labels=candidate_labels,
+            hypothesis_template="This text expresses {}"
+        )
+        return result['labels'][0], result['scores'][0]
+    except Exception as e:
+        print(f"Error processing text: {e}")
+        return None, 0.0
+
+def process_and_save_file(input_file, output_file):
+    """
+    Main function to process the file and save results
+    """
+    try:
+        # Load and sample data
+        print("Loading and sampling data...")
+        df = load_and_sample_data(input_file)
+        
+        # Setup classifier and category labels
+        print("Setting up classifier...")
+        classifier = setup_classifier()
+        category_labels = get_category_labels()
+        
+        # Process each text entry
+        print("Processing texts...")
+        new_categories = []
+        confidence_scores = []
+        
+        for text in tqdm(df['User Input']):
+            category, confidence = predict_category(text, classifier, category_labels)
+            new_categories.append(category if category else df['Category'].iloc[0])  # Fallback to original category
+            confidence_scores.append(confidence)
+        
+        # Add new columns
+        df['LLM_Suggested_Category'] = new_categories
+        df['LLM_Confidence'] = confidence_scores
+        df['Category_Changed'] = df['Category'] != df['LLM_Suggested_Category']
+        
+        # Calculate and display statistics
+        changes = df['Category_Changed'].sum()
+        print(f"\nStatistics:")
+        print(f"Total entries processed: {len(df)}")
+        print(f"Categories changed: {changes} ({(changes/len(df))*100:.2f}%)")
+        
+        # Display category distribution changes
+        print("\nCategory Distribution Changes:")
+        print("\nOriginal Categories:")
+        print(df['Category'].value_counts())
+        print("\nSuggested Categories:")
+        print(df['LLM_Suggested_Category'].value_counts())
+        
+        # Save the results
+        df.to_csv(output_file, index=False)
+        print(f"\nUpdated file saved as: {output_file}")
+        
+        # Show some examples of changes
+        changed_entries = df[df['Category_Changed']]
+        if not changed_entries.empty:
+            print("\nExample Category Changes:")
+            sample_changes = changed_entries.sample(min(5, len(changed_entries)))
+            for _, row in sample_changes.iterrows():
+                print(f"\nUser Input: {row['User Input']}")
+                print(f"Original Category: {row['Category']}")
+                print(f"Suggested Category: {row['LLM_Suggested_Category']}")
+                print(f"Confidence: {row['LLM_Confidence']:.2f}")
+                
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+def verify_categories(df):
+    """
+    Verify that all categories in the dataset are valid
+    """
+    valid_categories = set(get_category_labels())
+    current_categories = set(df['Category'].unique())
+    invalid_categories = current_categories - valid_categories
+    
+    if invalid_categories:
+        print(f"\nWarning: Found invalid categories: {invalid_categories}")
+        print("These will be replaced with LLM suggestions.")
+
+if __name__ == "__main__":
+    import torch
+    
+    # File paths
+    input_file = "mental_health_dataset.csv"
+    output_file = "mental_health_dataset_corrected.csv"
+    
+    # Process the file
+    process_and_save_file(input_file, output_file)
