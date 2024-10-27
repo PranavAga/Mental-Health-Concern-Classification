@@ -28,8 +28,7 @@ def hello():
     return {"message":"hello"}
 
 load_dotenv()  
-# mongo_url = os.getenv('MONGO_URL')
-mongo_url =  "mongodb+srv://pranavagarwal312:Fu5JMOZOgucm7VkS@cluster0.y2ufk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+mongo_url = os.getenv('MONGO_URL')
 
 client = MongoClient(mongo_url) 
 db = client.note_db
