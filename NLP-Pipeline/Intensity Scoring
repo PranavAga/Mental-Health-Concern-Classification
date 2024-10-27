@@ -1,0 +1,57 @@
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import accuracy_score, mean_squared_error
+import numpy as np
+
+# Load dataset
+data = pd.read_csv('/kaggle/input/mental-health-corrected-dataset-2/mental_health_corrected_dataset_2.csv')
+categories = ["Anxiety", "Career Confusion", "Depression", "Eating Disorder", 
+              "Health Anxiety", "Insomnia", "Positive Outlook", "Stress"]
+
+# Encode labels
+data['Category'] = data['Category'].astype('category')
+data['Category_Code'] = data['Category'].cat.codes
+data['Intensity'] = data['Intensity'].clip(1, 10)  # Ensure intensity is within [1, 10]
+
+# Text vectorization
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(data['Extracted Concern'])
+y_category = data['Category_Code']
+y_intensity = data['Intensity']
+
+# Train-test split
+split_index = int(0.8 * len(data))  # 80% train, 20% test
+X_train, X_test = X[:split_index], X[split_index:]
+y_train_category, y_test_category = y_category[:split_index], y_category[split_index:]
+y_train_intensity, y_test_intensity = y_intensity[:split_index], y_intensity[split_index:]
+
+# Train Naive Bayes Model for Category Classification
+nb_model = MultinomialNB()
+nb_model.fit(X_train, y_train_category)
+
+# Predict Category on Test Set
+y_pred_category = nb_model.predict(X_test)
+category_accuracy = accuracy_score(y_test_category, y_pred_category)
+print(f"Naive Bayes Category Classification Accuracy: {category_accuracy:.4f}")
+
+# Train Linear Regression Model for Intensity Prediction
+# Linear Regression requires dense format, so we convert sparse matrix to dense
+X_train_dense = X_train.toarray()
+X_test_dense = X_test.toarray()
+
+linear_regressor = LinearRegression()
+linear_regressor.fit(X_train_dense, y_train_intensity)
+
+# Predict Intensity on Test Set
+y_pred_intensity = linear_regressor.predict(X_test_dense)
+intensity_rmse = np.sqrt(mean_squared_error(y_test_intensity, y_pred_intensity))
+print(f"Linear Regression Intensity Prediction RMSE: {intensity_rmse:.4f}")
+
+# Display sample predictions for both category and intensity
+for i in range(5):
+    print(f"Text: {data['Extracted Concern'].iloc[split_index + i]}")
+    print(f"True Category: {categories[y_test_category.iloc[i]]} | Predicted Category: {categories[y_pred_category[i]]}")
+    print(f"True Intensity: {y_test_intensity.iloc[i]:.2f} | Predicted Intensity: {y_pred_intensity[i]:.2f}")
+    print('-' * 50)
